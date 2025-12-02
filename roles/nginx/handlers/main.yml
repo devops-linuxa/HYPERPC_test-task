@@ -1,0 +1,20 @@
+---
+# handlers file for nginx role
+
+- name: verify nginx config
+  ansible.builtin.command: nginx -t
+  listen: "validate_nginx_config"
+  args:
+    chdir: /etc/nginx/
+  # Всегда выполнять перед фактическим перезапуском
+  changed_when: false
+  # При ошибке проверки - провалить выполнение плейбука
+  failed_when: verify_nginx_config_result.rc != 0
+  register: verify_nginx_config_result
+
+- name: restart nginx service
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+  # Зависит от успешной проверки выше
+  listen: "restart_nginx_service"

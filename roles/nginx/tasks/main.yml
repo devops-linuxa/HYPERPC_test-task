@@ -1,0 +1,63 @@
+---
+# tasks file for nginx role
+
+- name: Install nginx package on Debian/Ubuntu systems
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Install nginx package on RedHat/CentOS systems
+  ansible.builtin.yum: # Или ansible.builtin.dnf для новых версий CentOS/Fedora
+    name: nginx
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Install nginx package on Alpine Linux
+  community.general.apk:
+    name: nginx
+    state: present
+    update_cache: true
+  # Alpine использует собственное семейство дистрибутивов 'Alpine'
+  when: ansible_distribution == "Alpine"
+
+- name: Ensure nginx backup directory exists
+  ansible.builtin.file:
+    path: "{{ nginx_backup_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Check if the current nginx config file exists
+  ansible.builtin.stat:
+    path: "{{ nginx_config_path }}"
+  register: nginx_config_stat_result
+  # Эта задача не должна считаться "изменившейся" (changed),
+  # она просто собирает информацию
+  changed_when: false
+
+- name: Backup current nginx config if it exists
+  ansible.builtin.copy:
+    src: "{{ nginx_config_path }}"
+    dest: "{{ nginx_backup_dir }}/nginx.conf.backup-{{ ansible_date_time.iso8601_basic_short }}"
+    remote_src: true
+    # Используем переменную, зарегистрированную предыдущей задачей
+  when:
+    - nginx_config_stat_result.stat.exists
+
+- name: Apply nginx configuration template
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_config_path }}"
+    mode: '0644'
+  register: nginx_config_status
+  # Отправляем уведомления хэндлерам при изменении файла
+  notify:
+    - "validate_nginx_config"
+    - "restart_nginx_service"
+
+- name: Ensure nginx service is running and enabled
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
