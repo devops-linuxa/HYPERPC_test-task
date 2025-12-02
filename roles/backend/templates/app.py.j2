@@ -1,17 +1,36 @@
 # {{ ansible_managed }}
 
 from flask import Flask, request
+# Импортируем модуль ipaddress для валидации форматов IP
+import ipaddress
 
 app = Flask(__name__)
 
+def is_ipv4(ip_str):
+    """Helper function to check if a string is a valid IPv4 address."""
+    try:
+        # Пытаемся создать объект IPv4-адреса.
+        # Если это IPv6 или невалидный IP, возникнет исключение ValueError.
+        ipaddress.IPv4Address(ip_str)
+        return True
+    except ipaddress.ValueError:
+        return False
+
 @app.route('/')
 def hello_world():
-    # Определяем IP клиента, проверяя заголовки X-Forwarded-For
+    client_ip = request.remote_addr # Запасной вариант по умолчанию
+
+    # Проверяем наличие заголовка X-Forwarded-For
     if 'X-Forwarded-For' in request.headers:
-        client_ip = request.headers['X-Forwarded-For'].split(',')[0].strip()
-    else:
-        # Запасной вариант, если запрос пришел напрямую (что маловероятно в нашей архитектуре)
-        client_ip = request.remote_addr
+        # Заголовок может содержать список IP через запятую (клиент, прокси1, прокси2)
+        ip_list = request.headers['X-Forwarded-For'].split(',')
+
+        # Ищем первый валидный IPv4 адрес в списке (обычно это адрес клиента)
+        for ip in ip_list:
+            ip = ip.strip()
+            if is_ipv4(ip):
+                client_ip = ip
+                break # Нашли первый IPv4, выходим из цикла
 
     return 'Тебя приветствует HYPERPC! Твой IP: {}'.format(client_ip)
 
