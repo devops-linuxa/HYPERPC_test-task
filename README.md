@@ -1,3 +1,8 @@
+![Ansible](img.shields.io)
+![Nginx](img.shields.io)
+![YAML](img.shields.io)
+![Linux](img.shields.io)
+
 ## Задача: развёртывание Nginx с использованием Ansible‑роли
 
 **Цель**  
