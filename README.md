@@ -1,8 +1,3 @@
-![Ansible Badge](img.shields.io)
-![Nginx Badge](img.shields.io)
-![YAML Badge](img.shields.io)
-![Linux Badge](img.shields.io)
-
 ## Задача: развёртывание Nginx с использованием Ansible‑роли
 
 **Цель**  
