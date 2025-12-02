@@ -36,3 +36,30 @@
      - изменении шаблона конфигурации;
      - необходимости обновления параметров сервиса.
    - Статус задач должен корректно отражать фактические изменения (changed/ok).
+
+## Проверка: развёртывания Nginx с использованием Ansible‑роли
+
+**Забираем репозиторий к себе**
+```bash
+git clone https://github.com/devops-linuxa/HYPERPC_test-task.git
+```
+
+**Проваливаемся в директорию**
+```bash
+cd HYPERPC_test-task/
+```
+
+**Стартуем...**
+```bash
+ansible-playbook -i inventory.ini playbook.yml
+```
+
+**Проверяем по адресу через `curl`, либо в любимом браузере:**
+```bash
+ curl https://hyperpc.linuxa.ru && echo
+```
+
+**Ответ:**
+```html
+Тебя приветствует HYPERPC! Твой IP: XXX.XXX.XXX.XXX
+```
