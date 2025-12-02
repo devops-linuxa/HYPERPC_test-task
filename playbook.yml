@@ -1,0 +1,19 @@
+---
+- name: Deploy web services stack
+  hosts: webservers
+  become: true # Запуск всех ролей с правами root
+
+  vars:
+    domain_name: hyperpc.linuxa.ru
+    # Порт бэкенда используется обеими ролями
+    backend_port: 3000
+
+  roles:
+    - role: backend
+      # Передача порта в роль backend через ее переменную по умолчанию (опционально)
+      # backend_port: 3000
+
+    - role: nginx
+      # Передача переменных в роль nginx
+      nginx_server_name: "{{ domain_name }}"
+      nginx_proxy_port: "{{ backend_port }}"
