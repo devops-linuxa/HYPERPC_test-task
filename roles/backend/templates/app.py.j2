@@ -32,7 +32,8 @@ def hello_world():
                 client_ip = ip
                 break # Нашли первый IPv4, выходим из цикла
 
-    return 'Тебя приветствует HYPERPC! Твой IP: {}'.format(client_ip)
+    html_response = '<h1>Тебя приветствует HYPERPC! Твой IP: <span style="color: red;">{}</span></h1>'.format(client_ip)
+    return html_response
 
 if __name__ == '__main__':
     app.run(port={{ backend_port }})
