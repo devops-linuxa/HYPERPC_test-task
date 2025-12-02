@@ -1,0 +1,19 @@
+# {{ ansible_managed }}
+
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    # Определяем IP клиента, проверяя заголовки X-Forwarded-For
+    if 'X-Forwarded-For' in request.headers:
+        client_ip = request.headers['X-Forwarded-For'].split(',')[0].strip()
+    else:
+        # Запасной вариант, если запрос пришел напрямую (что маловероятно в нашей архитектуре)
+        client_ip = request.remote_addr
+
+    return 'Тебя приветствует HYPERPC! Твой IP: {}'.format(client_ip)
+
+if __name__ == '__main__':
+    app.run(port={{ backend_port }})

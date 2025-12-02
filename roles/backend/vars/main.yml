@@ -1,0 +1,6 @@
+---
+# vars file for backend role
+backend_user: webuser
+backend_home: /opt/app/backend
+backend_venv_path: "{{ backend_home }}/venv"
+backend_port: 3000 # Порт, который слушает Gunicorn

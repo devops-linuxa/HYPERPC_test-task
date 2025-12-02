@@ -1,0 +1,72 @@
+---
+# tasks file for backend role
+
+- name: Install system packages for python and venv
+  ansible.builtin.package:
+    name:
+      - "{{ python_version }}"
+      - "{{ python_version }}-venv"
+      - build-essential # Для компиляции нативных пакетов при необходимости
+    state: present
+
+- name: Create dedicated user and group for the app
+  ansible.builtin.user:
+    name: "{{ backend_user }}"
+    comment: "Backend Service User"
+    shell: /bin/false
+    createhome: true
+    state: present
+
+- name: Ensure application directory exists
+  ansible.builtin.file:
+    path: "{{ backend_home }}"
+    state: directory
+    owner: "{{ backend_user }}"
+    group: "{{ backend_user }}"
+    mode: '0755'
+
+- name: Create Python virtual environment
+  ansible.builtin.command:
+    cmd: "{{ python_version }} -m venv {{ backend_venv_path }}"
+    creates: "{{ backend_venv_path }}/bin/activate"
+  register: venv_creation_status
+
+- name: Copy requirements file
+  ansible.builtin.template:
+    src: requirements.txt.j2
+    dest: "{{ backend_home }}/requirements.txt"
+    owner: "{{ backend_user }}"
+    group: "{{ backend_user }}"
+    mode: '0644'
+  register: requirements_file_status
+
+- name: Install python dependencies with pip
+  ansible.builtin.pip:
+    requirements: "{{ backend_home }}/requirements.txt"
+    virtualenv: "{{ backend_venv_path }}"
+    state: present
+  when: requirements_file_status.changed or venv_creation_status.changed
+
+- name: Copy application source code (app.py)
+  ansible.builtin.template:
+    src: app.py.j2
+    dest: "{{ backend_home }}/app.py"
+    owner: "{{ backend_user }}"
+    group: "{{ backend_user }}"
+    mode: '0644'
+  register: app_source_status
+
+- name: Copy systemd service file
+  ansible.builtin.template:
+    src: backend.service.j2
+    dest: /etc/systemd/system/backend.service
+  register: service_file_status
+
+- name: Ensure backend service is running and enabled
+  ansible.builtin.systemd_service:
+    name: backend
+    state: restarted
+    enabled: true
+    daemon_reload: true # Перезагрузить systemd после добавления нового файла юнита
+  # Перезапускать сервис только если изменился код или файл сервиса
+  when: app_source_status.changed or service_file_status.changed

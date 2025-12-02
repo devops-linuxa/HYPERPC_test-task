@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn instance to serve backend app
+After=network.target
+
+[Service]
+User={{ backend_user }}
+Group={{ backend_user }}
+WorkingDirectory={{ backend_home }}
+Environment="PATH={{ backend_venv_path }}/bin"
+ExecStart={{ backend_home }}/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:{{ backend_port }} app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
