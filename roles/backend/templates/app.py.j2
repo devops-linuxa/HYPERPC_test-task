@@ -13,7 +13,7 @@ def is_ipv4(ip_str):
         # Если это IPv6 или невалидный IP, возникнет исключение ValueError.
         ipaddress.IPv4Address(ip_str)
         return True
-    except ipaddress.ValueError:
+    except ValueError:
         return False
 
 @app.route('/')
