@@ -7,7 +7,7 @@ User={{ backend_user }}
 Group={{ backend_user }}
 WorkingDirectory={{ backend_home }}
 Environment="PATH={{ backend_venv_path }}/bin"
-ExecStart={{ backend_home }}/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:{{ backend_port }} app:app
+ExecStart={{ backend_home }}/venv/bin/gunicorn --workers 1 --bind 0.0.0.0:{{ backend_port }} app:app
 Restart=always
 
 [Install]
