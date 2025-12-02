@@ -1,7 +1,5 @@
 # TODO: Разбить таски на отдельные файлы yml
 ---
-# tasks file for nginx role
-
 - name: Install nginx package on Debian/Ubuntu systems
   ansible.builtin.apt:
     name: nginx
@@ -10,7 +8,7 @@
   when: ansible_os_family == "Debian"
 
 - name: Install nginx package on RedHat/CentOS systems
-  ansible.builtin.yum: # Или ansible.builtin.dnf для новых версий CentOS/Fedora
+  ansible.builtin.yum:
     name: nginx
     state: present
   when: ansible_os_family == "RedHat"
@@ -20,7 +18,6 @@
     name: nginx
     state: present
     update_cache: true
-  # Alpine использует собственное семейство дистрибутивов 'Alpine'
   when: ansible_distribution == "Alpine"
 
 - name: Ensure nginx backup directory exists

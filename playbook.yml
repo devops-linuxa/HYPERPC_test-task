@@ -17,5 +17,3 @@
       # Передача переменных в роль nginx
       nginx_server_name: "{{ domain_name }}"
       nginx_proxy_port: "{{ backend_port }}"
-
-# TODO: добавить TASK: "systemctl restart backend.service" после копирования app.py
