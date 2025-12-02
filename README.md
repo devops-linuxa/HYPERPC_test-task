@@ -37,6 +37,37 @@
      - необходимости обновления параметров сервиса.
    - Статус задач должен корректно отражать фактические изменения (changed/ok).
 
+## Структура проекта: ##
+```
+.
+├── inventory.ini
+├── playbook.yml
+├── README.md
+└── roles
+    ├── backend
+    │   ├── defaults
+    │   │   └── main.yml
+    │   ├── tasks
+    │   │   └── main.yml
+    │   ├── templates
+    │   │   ├── app.py.j2
+    │   │   ├── backend.service.j2
+    │   │   └── requirements.txt.j2
+    │   └── vars
+    │       └── main.yml
+    └── nginx
+        ├── defaults
+        │   └── main.yml
+        ├── handlers
+        │   └── main.yml
+        ├── tasks
+        │   └── main.yml
+        ├── templates
+        │   └── nginx.conf.j2
+        └── vars
+            └── main.yml
+```
+
 ## Проверка: развёртывания Nginx с использованием Ansible‑роли
 
 **Забираем репозиторий к себе**
