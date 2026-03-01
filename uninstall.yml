@@ -1,0 +1,61 @@
+---
+- name: Full Purge of HYPERPC Project (including Nginx)
+  hosts: all
+  become: true
+  tasks:
+    - name: Purge Nginx and cleanup web-server traces
+      block:
+        - name: Remove nginx packages with configs (purge)
+          ansible.builtin.apt:
+            name: 
+              - nginx
+              - nginx-common
+              - nginx-full
+            state: absent
+            purge: true  # Удаляет конфигурационные файлы в /etc/nginx
+        
+        - name: Autoremove unused dependencies
+          ansible.builtin.apt:
+            autoremove: true
+            purge: true
+
+        - name: Force delete remaining nginx directories
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          loop:
+            - /etc/nginx
+            - /var/www/frontend
+            - /var/log/nginx
+
+    - name: Purge Backend and Application traces
+      block:
+        - name: Stop and disable backend service
+          ansible.builtin.systemd:
+            name: backend
+            state: stopped
+            enabled: false
+          ignore_errors: true
+
+        - name: Remove systemd unit and app files
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          loop:
+            - /etc/systemd/system/backend.service
+            - /opt/app/backend
+
+        - name: Reload systemd daemon
+          ansible.builtin.systemd:
+            daemon_reload: true
+
+    - name: Remove system user
+      ansible.builtin.user:
+        name: webuser
+        state: absent
+        remove: true  # Удаляет /home/webuser
+      ignore_errors: true
+
+    - name: Summary
+      ansible.builtin.debug:
+        msg: "System is clean. Nginx, backend app and users have been purged."

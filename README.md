@@ -94,3 +94,8 @@ ansible-playbook -i inventory.ini playbook.yml
 ```html
 Тебя приветствует HYPERPC! Твой IP: XXX.XXX.XXX.XXX
 ```
+
+## Удаляем весь этот блудняк:
+```bash
+ansible-playbook -i inventory.ini uninstall.yml
+```
